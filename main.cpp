@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <ctime>
+#include <fstream>
 using namespace std;
 
 // ========================
@@ -27,52 +28,48 @@ public:
         lastSeen = "";
     }
 
-    User(string uname, string pwd, string phone)
-    {
+
+    User(string uname, string pwd, string phone) {
+
         // TODO: Implement parameterized constructor
         username=uname;
         password=pwd;
         phoneNumber=phone;
     }
 
-    string getUsername() const
-    {
+
+    string getUsername() const {
+
         // TODO: Implement getter
         return username;
     }
 
-    string getPhoneNumber() const
-    {
+    string getPhoneNumber() const {
         // TODO: Implement getter
         return phoneNumber;
     }
 
-    string getStatus() const
-    {
+    string getStatus() const {
         // TODO: Implement getter
         return status;
     }
 
-    string getLastSeen() const
-    {
+    string getLastSeen() const {
         // TODO: Implement getter
         return lastSeen;
     }
 
-    void setStatus(string newStatus)
-    {
+    void setStatus(string newStatus) {
         // TODO: Implement setter
         status=newStatus;
     }
 
-    void setPhoneNumber(string phone)
-    {
+    void setPhoneNumber(string phone) {
         // TODO: Implement setter
         phoneNumber=phone;
     }
 
-    void updateLastSeen()
-    {
+    void updateLastSeen() {
         // TODO: Implement last seen update
         time_t now = time(0);          // get current time , seconds since jan 1970
         tm* localTime = localtime(&now); //converts to readable format
@@ -83,14 +80,12 @@ public:
         lastSeen = ss.str();
     }
 
-    bool checkPassword(string pwd) const
-    {
+    bool checkPassword(string pwd) const {
         // TODO: Implement password check
         return password==pwd;
     }
 
-    void changePassword(string newPwd)
-    {
+    void changePassword(string newPwd) {
         // TODO: Implement password change
         password=newPwd
     }
@@ -120,8 +115,7 @@ public:
 
     }
 
-    Message(string sndr, string cntnt)
-    {
+    Message(string sndr, string cntnt) {
         // TODO: Implement parameterized constructor
         sender=sndr;
         content=cntnt;
@@ -130,50 +124,42 @@ public:
         replyTo=nullptr;
     }
 
-    string getContent() const
-    {
+    string getContent() const {
         // TODO: Implement getter
         return content;
     }
 
-    string getSender() const
-    {
+    string getSender() const {
         // TODO: Implement getter
         return sender;
     }
 
-    string getTimestamp() const
-    {
+    string getTimestamp() const {
         // TODO: Implement getter
         return timestamp;
     }
 
-    string getStatus() const
-    {
+    string getStatus() const {
         // TODO: Implement getter
         return status;
     }
 
-    Message* getReplyTo() const
-    {
+    Message* getReplyTo() const {
         // TODO: Implement getter
         return replyTo;
     }
 
-    void setStatus(string newStatus)
-    {
+    void setStatus(string newStatus) {
         // TODO: Implement setter
         status=newStatus;
     }
 
-    void setReplyTo(Message* msg)
-    {
+    void setReplyTo(Message* msg) {
         // TODO: Implement setter
         replyTo=msg;
     }
 
-    void updateTimestamp()
-    {
+    void updateTimestamp() {
         // TODO: Implement timestamp update
         time_t now = time(0);          // get current time , seconds since jan 1970
         tm* localTime = localtime(&now); //converts to readable format
@@ -184,8 +170,7 @@ public:
         timestamp = ss.str();
     }
 
-    void display() const
-    {
+    void display() const {
         // TODO: Implement message display
         cout << "[" << timestamp << "] ";
         cout << sender << ": ";
@@ -197,8 +182,7 @@ public:
         }
     }
 
-    void addEmoji(string emojiCode)
-    {
+    void addEmoji(string emojiCode) {
         // TODO: Implement emoji support
         content += " " + emojiCode;
     }
@@ -218,38 +202,78 @@ public:
     Chat()
     {
         // TODO: Implement default constructor
+        chatName = " ";
     }
 
-    Chat(vector<string> users, string name)
-    {
+    Chat(vector<string> users, string name) {
         // TODO: Implement parameterized constructor
+        participants = users;
+        chatName = name;
     }
 
-    void addMessage(const Message& msg)
-    {
+    void addMessage(const Message& msg) {
         // TODO: Implement message addition
+        messages.push_back(msg);
     }
 
-    bool deleteMessage(int index, const string& username)
-    {
+    bool deleteMessage(int index, const string& username) {
         // TODO: Implement message deletion
+        if(index >= 0 && index < messages.size())
+        {
+            if(messages[index].getSender() == username)
+            {
+                messages.erase(messages.begin() + index);
+                return true;
+            }
+        }
         return false;
     }
 
-    virtual void displayChat() const
-    {
+    virtual void displayChat() const {
         // TODO: Implement chat display
+        cout << "Chat: " << chatName << endl;
+        for(const Message& m : messages)
+        {
+            m.display();
+        }
     }
 
-    vector<Message> searchMessages(string keyword) const
-    {
+    vector<Message> searchMessages(string keyword) const {
         // TODO: Implement message search
-        return {};
+        vector<Message> res;
+        for(const Message& m : messages)
+        {
+            if(m.getContent().find(keyword) != string::npos)
+            {
+                res.push_back(m);
+            }
+        }
+
+        return res;
     }
 
-    void exportToFile(const string& filename) const
-    {
+    void exportToFile(const string& filename) const {
         // TODO: Implement export to file
+        ofstream file(filename);
+        if(!file)
+        {
+            cout << "Error cannot open file " << endl;
+            return ;
+        }
+        file << "Chat: " << chatName << endl;
+        file << "Partiicipants:" << endl;
+        for(const string& p : participants)
+        {
+            file << p << endl;
+
+        }
+        file << "\nMessages:" << endl;
+        for(const Message& m : messages)
+        {
+            file << "[" << m.getTimestamp() << "]" << m.getSender() << ": " << m.getContent() << endl;
+
+        }
+        file.close();
     }
 };
 
@@ -266,16 +290,26 @@ public:
     PrivateChat(string u1, string u2)
     {
         // TODO: Implement constructor
+        user1 =u1;
+        user2 = u2;
+        participants ={u1,u2};
+        chatName = "Chat between " + u1 + " and " + u2;
+
     }
 
-    void displayChat() const override
-    {
+    void displayChat() const override {
         // TODO: Implement private chat display
+        cout << "Private " << chatName << endl;
+        for(const Message& m : messages)
+        {
+            m.display();
+        }
+
     }
 
-    void showTypingIndicator(const string& username) const
-    {
+    void showTypingIndicator(const string& username) const {
         // TODO: Implement typing indicator
+        cout << username << " is typing..." << endl;
     }
 };
 
@@ -294,41 +328,34 @@ public:
         // TODO: Implement constructor
     }
 
-    void addAdmin(string newAdmin)
-    {
+    void addAdmin(string newAdmin) {
         // TODO: Implement add admin
     }
 
-    bool removeParticipant(const string& admin, const string& userToRemove)
-    {
+    bool removeParticipant(const string& admin, const string& userToRemove) {
         // TODO: Implement remove participant
         return false;
     }
 
-    bool isAdmin(string username) const
-    {
+    bool isAdmin(string username) const {
         // TODO: Implement admin check
         return false;
     }
 
-    bool isParticipant(string username) const
-    {
+    bool isParticipant(string username) const {
         // TODO: Implement participant check
         return false;
     }
 
-    void setDescription(string desc)
-    {
+    void setDescription(string desc) {
         // TODO: Implement set description
     }
 
-    void displayChat() const override
-    {
+    void displayChat() const override {
         // TODO: Implement group chat display
     }
 
-    void sendJoinRequest(const string& username)
-    {
+    void sendJoinRequest(const string& username) {
         // TODO: Implement join request
     }
 };
@@ -343,20 +370,17 @@ private:
     vector<Chat*> chats;
     int currentUserIndex;
 
-    int findUserIndex(string username) const
-    {
+    int findUserIndex(string username) const {
         // TODO: Implement user search
         return -1;
     }
 
-    bool isLoggedIn() const
-    {
+    bool isLoggedIn() const {
         // TODO: Implement login check
         return false;
     }
 
-    string getCurrentUsername() const
-    {
+    string getCurrentUsername() const {
         // TODO: Implement get current user
         return "";
     }
@@ -364,42 +388,33 @@ private:
 public:
     WhatsApp() : currentUserIndex(-1) {}
 
-    void signUp()
-    {
+    void signUp() {
         // TODO: Implement user registration
     }
 
-    void login()
-    {
+    void login() {
         // TODO: Implement user login
     }
 
-    void startPrivateChat()
-    {
+    void startPrivateChat() {
         // TODO: Implement private chat creation
     }
 
-    void createGroup()
-    {
+    void createGroup() {
         // TODO: Implement group creation
     }
 
-    void viewChats() const
-    {
+    void viewChats() const {
         // TODO: Implement chat viewing
     }
 
-    void logout()
-    {
+    void logout() {
         // TODO: Implement logout
     }
 
-    void run()
-    {
-        while (true)
-        {
-            if (!isLoggedIn())
-            {
+    void run() {
+        while (true) {
+            if (!isLoggedIn()) {
                 cout << "\n1. Login\n2. Sign Up\n3. Exit\nChoice: ";
                 int choice;
                 cin >> choice;
