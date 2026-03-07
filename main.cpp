@@ -154,6 +154,10 @@ public:
         chatName = name;
     }
 
+    vector<string> getParticipants(){
+        return participants;
+    }
+
     void addMessage(const Message& msg) {
         // TODO: Implement message addition
         messages.push_back(msg);
@@ -431,61 +435,80 @@ public:
         chats.push_back(privateChat);
     }
 
-void createGroup() {
-    string userName, groupName;
-    string creator = getCurrentUsername();
+    void createGroup() {
+        string userName, groupName;
+        string creator = getCurrentUsername();
 
-    vector<string> users = {creator};
+        vector<string> users = {creator};
 
-    cout << "Enter Group name\n";
+        cout << "Enter Group name\n";
 
-    while (true) {
-        cin >> groupName;
+        while (true) {
+            cin >> groupName;
 
-        if (groupName.empty()) {
-            cout << "Group name can't be empty\n";
-        } else {
-            break;
+            if (groupName.empty()) {
+                cout << "Group name can't be empty\n";
+            } else {
+                break;
+            }
         }
+
+        int choice;
+
+        while (true) {
+            cout << "1. Add Group member\n2. Create Group\n";
+            cin >> choice;
+            if (choice == 2) {
+                break;
+            }
+            if (choice == 1) {
+                cout << "Enter Group member name\n";
+                while (true) {
+                    cin >> userName;
+                    for(auto &user:users){
+                        if (userName == user) {
+                            cout << "This user is already added\nEnter another name\n";
+                            break;
+                        }
+                    }
+                    if (findUserIndex(userName) == -1) {
+                        cout << "This user doesn't exist\nEnter another name\n";
+                    }
+                    else {
+                        users.push_back(userName);
+                        break;
+                    }
+                }
+            }
+            else {
+                cout << "Invalid choice\n";
+            }
+        }
+        Chat* groupChat = new GroupChat(users, groupName, creator);
+        chats.push_back(groupChat);
+        cout << "Group created successfully\n";
     }
 
-    int choice;
+    void viewChats() {
+        string currentUser = getCurrentUsername();
+        vector<Chat*> myChats;
 
-    while (true) {
-        cout << "1. Add Group member\n2. Create Group\n";
-        cin >> choice;
-        if (choice == 2) {
-            break;
-        }
-        if (choice == 1) {
-            cout << "Enter Group member name\n";
-            while (true) {
-                cin >> userName;
-                if (find(users.begin(), users.end(), userName) != users.end()) {
-                    cout << "This user is already added\nEnter another name\n";
-                }
-                else if (findUserIndex(userName) == -1) {
-                    cout << "This user doesn't exist\nEnter another name\n";
-                }
-                else {
-                    users.push_back(userName);
+        cout << "\nYour Chats:\n";
+
+        for(auto & chat:chats){
+            for(auto& user:chat->getParticipants()){
+                if(user==currentUser){
+                    myChats.push_back(chat);
                     break;
                 }
             }
         }
-        else {
-            cout << "Invalid choice\n";
-        }
-    }
-    Chat* groupChat = new GroupChat(users, groupName, creator);
-    chats.push_back(groupChat);
-    cout << "Group created successfully\n";
-}
 
-    void viewChats() const {
-    // we need a method that checks if the user is a part of the chat
-        string userName = getCurrentUsername();
-        for(auto &chat:chats){
+        if (myChats.empty()) {
+            cout << "No chats found\n";
+            return;
+        }
+        for( auto & chat:myChats){
             chat->displayChat();
         }
     }
