@@ -320,47 +320,73 @@ public:
 // ========================
 //      GROUP CHAT CLASS
 // ========================
-class GroupChat : public Chat
-{
+class GroupChat : public Chat {
 private:
     vector<string> admins;
     string description;
 
 public:
+    // Constructor: initialize with users, name, and creator
     GroupChat(vector<string> users, string name, string creator)
-    {
-        // TODO: Implement constructor
+        : Chat(users, name) {
+        admins.push_back(creator); // creator is the first admin
+        description = "No description set.";
     }
 
+    // Add a new admin (must already be a participant)
     void addAdmin(string newAdmin) {
-        // TODO: Implement add admin
+        if (isParticipant(newAdmin) && !isAdmin(newAdmin)) {
+            admins.push_back(newAdmin);
+        }
     }
 
+    // Remove a participant (only if caller is admin)
     bool removeParticipant(const string& admin, const string& userToRemove) {
-        // TODO: Implement remove participant
+        if (!isAdmin(admin)) return false;
+
+        auto& participants = getUsers(); // assuming Chat has getUsers()
+        auto it = find(participants.begin(), participants.end(), userToRemove);
+        if (it != participants.end()) {
+            participants.erase(it);
+            return true;
+        }
         return false;
     }
 
+    // Check if user is admin
     bool isAdmin(string username) const {
-        // TODO: Implement admin check
-        return false;
+        return find(admins.begin(), admins.end(), username) != admins.end();
     }
 
+    // Check if user is participant
     bool isParticipant(string username) const {
-        // TODO: Implement participant check
-        return false;
+        const auto& participants = getUsers();
+        return find(participants.begin(), participants.end(), username) != participants.end();
     }
 
+    // Set group description
     void setDescription(string desc) {
-        // TODO: Implement set description
+        description = desc;
     }
 
+    // Display group chat info
     void displayChat() const override {
-        // TODO: Implement group chat display
+        cout << "Group Name: " << getName() << endl;
+        cout << "Description: " << description << endl;
+
+        cout << "Admins: ";
+        for (const auto& admin : admins) cout << admin << " ";
+        cout << endl;
+
+        cout << "Participants: ";
+        for (const auto& user : getUsers()) cout << user << " ";
+        cout << endl;
     }
 
+    // Handle join request
     void sendJoinRequest(const string& username) {
-        // TODO: Implement join request
+        cout << username << " has requested to join the group." << endl;
+        // Could extend with approval system later
     }
 };
 
