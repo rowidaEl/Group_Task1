@@ -3,6 +3,9 @@
 #include <string>
 #include <ctime>
 #include <fstream>
+#include <sstream>  
+#include <iomanip>  
+#include <algorithm>
 using namespace std;
 
 // ========================
@@ -87,7 +90,7 @@ public:
 
     void changePassword(string newPwd) {
         // TODO: Implement password change
-        password=newPwd
+        password=newPwd;
     }
 };
 
@@ -344,7 +347,7 @@ public:
     bool removeParticipant(const string& admin, const string& userToRemove) {
         if (!isAdmin(admin)) return false;
 
-        auto& participants = getUsers(); // assuming Chat has getUsers()
+        vector<string> participants = this->participants; 
         auto it = find(participants.begin(), participants.end(), userToRemove);
         if (it != participants.end()) {
             participants.erase(it);
@@ -360,7 +363,7 @@ public:
 
     // Check if user is participant
     bool isParticipant(string username) const {
-        const auto& participants = getUsers();
+        vector<string> participants = this->participants; 
         return find(participants.begin(), participants.end(), username) != participants.end();
     }
 
@@ -371,7 +374,7 @@ public:
 
     // Display group chat info
     void displayChat() const override {
-        cout << "Group Name: " << getName() << endl;
+        cout << "Group Name: " << this->chatName << endl;
         cout << "Description: " << description << endl;
 
         cout << "Admins: ";
@@ -379,7 +382,7 @@ public:
         cout << endl;
 
         cout << "Participants: ";
-        for (const auto& user : getUsers()) cout << user << " ";
+        for (const auto& user : this->participants) cout << user << " ";
         cout << endl;
     }
 
@@ -500,7 +503,7 @@ public:
         currentUserIndex = index;
         cout<<"Logged in Successfully\n";
     }
-
+//add chatting functionality
     void startPrivateChat() {
         cout << "Enter username to start chat with: \n";
         bool Valid =false;
@@ -521,6 +524,15 @@ public:
         }
         Chat* privateChat = new  PrivateChat(currentUserName,userName);
         chats.push_back(privateChat);
+        bool exit=false;
+        while(!exit){
+            cout<<"1. Send a message \n2. Delete a message\n3.Exit Private chat\n";
+            int choice;
+            cin>>choice;
+            if(choice==1){
+                
+            }
+        }
     }
 
     void createGroup() {
