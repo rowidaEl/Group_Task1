@@ -173,8 +173,9 @@ public:
         timestamp = ss.str();
     }
 
-    void display() const {
+    void display()  {
         // TODO: Implement message display
+        updateTimestamp();
         cout << "[" << timestamp << "] ";
         cout << sender << ": ";
         cout << content << endl;
@@ -236,10 +237,10 @@ public:
         return false;
     }
 
-    virtual void displayChat() const {
+    virtual void displayChat()  {
         // TODO: Implement chat display
         cout << "Chat: " << chatName << endl;
-        for(const Message& m : messages)
+        for( Message& m : messages)
         {
             m.display();
         }
@@ -304,10 +305,10 @@ public:
 
     }
 
-    void displayChat() const override {
+    void displayChat()  override {
         // TODO: Implement private chat display
         cout << "Private " << chatName << endl;
-        for(const Message& m : messages)
+        for( Message& m : messages)
         {
             m.display();
         }
@@ -373,7 +374,7 @@ public:
     }
 
     // Display group chat info
-    void displayChat() const override {
+    void displayChat()  override {
         cout << "Group Name: " << this->chatName << endl;
         cout << "Description: " << description << endl;
 
@@ -526,11 +527,32 @@ public:
         chats.push_back(privateChat);
         bool exit=false;
         while(!exit){
-            cout<<"1. Send a message \n2. Delete a message\n3.Exit Private chat\n";
+            privateChat->displayChat();
+            cout<<"1. Send a message \n2. Delete a message\n3. Exit Private chat\n";
             int choice;
             cin>>choice;
-            if(choice==1){
-                
+            if(choice == 1){
+                cin.ignore(); 
+                string content;
+                cout << "Enter message: ";
+                getline(cin, content);
+                Message msg(currentUserName, content);
+                privateChat->addMessage(msg);
+                cout << "Message sent!\n";
+            }
+            else if(choice == 2){
+                int index;
+                cout << "Enter message number to delete (Numbering starts from 0): ";
+                cin >> index;
+                if(privateChat->deleteMessage(index, currentUserName)){
+                    cout << "Message deleted successfully\n";
+                }
+                else{
+                    cout << "You can only delete your own messages\n";
+                }
+            }
+            else if(choice == 3){
+               exit = true;
             }
         }
     }
