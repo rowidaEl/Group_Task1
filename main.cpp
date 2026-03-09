@@ -3,8 +3,8 @@
 #include <string>
 #include <ctime>
 #include <fstream>
-#include <sstream>  
-#include <iomanip>  
+#include <sstream>
+#include <iomanip>
 #include <algorithm>
 using namespace std;
 
@@ -38,6 +38,8 @@ public:
         username=uname;
         password=pwd;
         phoneNumber=phone;
+        status = "Online";
+       updateLastSeen();
     }
 
 
@@ -175,7 +177,7 @@ public:
 
     void display()  {
         // TODO: Implement message display
-        updateTimestamp();
+
         cout << "[" << timestamp << "] ";
         cout << sender << ": ";
         cout << content << endl;
@@ -186,10 +188,31 @@ public:
         }
     }
 
-    void addEmoji(string emojiCode) {
+       void addEmoji(string emojiCode) {
         // TODO: Implement emoji support
-        content += " " + emojiCode;
+
+        string emoji = "";
+        if(emojiCode == ":)")
+            emoji = "😊";
+        else if(emojiCode == ":(")
+            emoji = "😢";
+            else if(emojiCode == ":D")
+            emoji = "😄";
+            else if(emojiCode == "<3")
+            emoji = "❤️";
+            else if(emojiCode == ":thumbsup:")
+            emoji =  "👍";
+            else return ;
+            size_t pos = 0;
+    while ((pos = content.find(emojiCode, pos)) != string::npos) {
+        content.replace(pos, emojiCode.length(), emoji);
+        pos += emoji.length();
     }
+
+
+
+    }
+
 };
 
 // ========================
@@ -220,7 +243,7 @@ public:
     }
     vector<Message>& getMessages() {
         return messages;
-    }   
+    }
     void addMessage(const Message& msg) {
         // TODO: Implement message addition
         messages.push_back(msg);
@@ -395,7 +418,7 @@ public:
             return;
         }
 
-        cout << username << " has requested to join the group \"" 
+        cout << username << " has requested to join the group \""
             << chatName << "\".\n";
     }
 };
@@ -439,7 +462,7 @@ public:
         string name, password, phoneNumber;
         bool Valid = false;
         cout<<"Enter Username:\n";
-        while(!Valid){    
+        while(!Valid){
             cin>>name;
             if(!name.size()){
                 cout<<"Username can't be empty\n";
@@ -461,7 +484,7 @@ public:
             if(password.size()<6){
                 cout<<"Password Must be at least 6 charachters\n";
                 continue;
-            } 
+            }
             Valid = true;
         }
         Valid = false;
@@ -471,7 +494,7 @@ public:
             if(!phoneNumber.size()){
                 cout<<"Phone Number can't be empty\n";
                 continue;
-            } 
+            }
             Valid = true;
         }
         users.push_back(User(name,password,phoneNumber));
@@ -574,7 +597,7 @@ public:
             int choice;
             cin>>choice;
             if(choice == 1){
-                cin.ignore(); 
+                cin.ignore();
                 string content;
                 PrivateChat* pc = dynamic_cast<PrivateChat*>(privateChat);
                 pc->showTypingIndicator(currentUserName);
@@ -677,7 +700,7 @@ public:
                     users.push_back(userName);
                     continue;
                 }
-                
+
             }
             else if(choice ==2){
                 cout<<"Enter group description:\n";
@@ -743,7 +766,7 @@ public:
                 gc->addMessage(msg);
             }
             else if(choice == 5){
-                        
+
                 int index;
                 cout << "Enter message index: ";
                 cin >> index;
